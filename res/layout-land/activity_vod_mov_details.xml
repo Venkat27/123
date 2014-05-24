@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:background="#FF7C00" >
+          android:background="@drawable/shape_a_ch_bg">
 
         <TextView
             android:id="@+id/a_vod_mov_dtls_tv_mov_dtls"
@@ -37,7 +37,7 @@
             android:background="@drawable/shape_mov_details_layout_bg"
             android:orientation="vertical" >
 
-            <com.mobilevue.imagehandler.SqareImageView
+            <com.obs.imagehandler.SquareImageView
                 android:id="@+id/a_vod_mov_dtls_iv_mov_img"
                 android:layout_width="210dp"
                 android:layout_height="280dp"
