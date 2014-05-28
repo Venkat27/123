@@ -1500,37 +1500,36 @@ containing a value of this type.
         public static final int activity_main=0x7f03001a;
         public static final int activity_my_account=0x7f03001b;
         public static final int activity_network_check=0x7f03001c;
-        public static final int activity_paypal=0x7f03001d;
-        public static final int activity_plan=0x7f03001e;
-        public static final int activity_register=0x7f03001f;
-        public static final int activity_video_player=0x7f030020;
-        public static final int activity_vod=0x7f030021;
-        public static final int activity_vod_mov_details=0x7f030022;
-        public static final int ch_epg_details_list_row=0x7f030023;
-        public static final int ch_gridview_item=0x7f030024;
-        public static final int ch_listview_item=0x7f030025;
-        public static final int f_list_category_row_item=0x7f030026;
-        public static final int f_list_channel_item=0x7f030027;
-        public static final int f_my_pkgs_item=0x7f030028;
-        public static final int f_plan_list_group=0x7f030029;
-        public static final int f_plan_list_item=0x7f03002a;
-        public static final int fragment_category=0x7f03002b;
-        public static final int fragment_channels_default_order=0x7f03002c;
-        public static final int fragment_channels_sorted=0x7f03002d;
-        public static final int fragment_epg=0x7f03002e;
-        public static final int fragment_epg_details_list_row=0x7f03002f;
-        public static final int fragment_my_packages=0x7f030030;
-        public static final int fragment_my_profile=0x7f030031;
-        public static final int header_gradient=0x7f030032;
-        public static final int main_menu_list_row=0x7f030033;
-        public static final int media_controller=0x7f030034;
-        public static final int media_controller_live_tv=0x7f030035;
-        public static final int media_controller_live_tv_new=0x7f030036;
-        public static final int plan_list_group=0x7f030037;
-        public static final int plan_list_item=0x7f030038;
-        public static final int support_simple_spinner_dropdown_item=0x7f030039;
-        public static final int vod_categ_list_row=0x7f03003a;
-        public static final int vod_gridview_item=0x7f03003b;
+        public static final int activity_plan=0x7f03001d;
+        public static final int activity_register=0x7f03001e;
+        public static final int activity_video_player=0x7f03001f;
+        public static final int activity_vod=0x7f030020;
+        public static final int activity_vod_mov_details=0x7f030021;
+        public static final int ch_epg_details_list_row=0x7f030022;
+        public static final int ch_gridview_item=0x7f030023;
+        public static final int ch_listview_item=0x7f030024;
+        public static final int f_list_category_row_item=0x7f030025;
+        public static final int f_list_channel_item=0x7f030026;
+        public static final int f_my_pkgs_item=0x7f030027;
+        public static final int f_plan_list_group=0x7f030028;
+        public static final int f_plan_list_item=0x7f030029;
+        public static final int fragment_category=0x7f03002a;
+        public static final int fragment_channels_default_order=0x7f03002b;
+        public static final int fragment_channels_sorted=0x7f03002c;
+        public static final int fragment_epg=0x7f03002d;
+        public static final int fragment_epg_details_list_row=0x7f03002e;
+        public static final int fragment_my_packages=0x7f03002f;
+        public static final int fragment_my_profile=0x7f030030;
+        public static final int header_gradient=0x7f030031;
+        public static final int main_menu_list_row=0x7f030032;
+        public static final int media_controller=0x7f030033;
+        public static final int media_controller_live_tv=0x7f030034;
+        public static final int media_controller_live_tv_new=0x7f030035;
+        public static final int plan_list_group=0x7f030036;
+        public static final int plan_list_item=0x7f030037;
+        public static final int support_simple_spinner_dropdown_item=0x7f030038;
+        public static final int vod_categ_list_row=0x7f030039;
+        public static final int vod_gridview_item=0x7f03003a;
     }
     public static final class menu {
         public static final int ch_menu=0x7f0e0000;
@@ -1601,11 +1600,11 @@ containing a value of this type.
         public static final int app_name=0x7f0b001f;
         public static final int balance=0x7f0b0020;
         public static final int balance_updated_at=0x7f0b0021;
-        /**  Spark  admin:obs@123 
+        public static final int basic_auth=0x7f0b0022;
+        /**  Spark  admin/obs@123 
          */
-        public static final int basic_auth=0x7f0b0023;
-        public static final int basic_auth_=0x7f0b0022;
-        /**  Peter  billing:password 
+        public static final int basic_auth_=0x7f0b0023;
+        /**  Peter  billing/password 
          */
         public static final int cancel=0x7f0b0024;
         public static final int cast_crew=0x7f0b0025;
@@ -1647,34 +1646,25 @@ containing a value of this type.
         public static final int sel_country=0x7f0b0049;
         public static final int sel_pkg=0x7f0b004a;
         public static final int serialno=0x7f0b004b;
-        /**  Quasay 
-         */
-        public static final int server_url=0x7f0b0051;
-        public static final int server_url_=0x7f0b004c;
-        /**  strom 
-         */
-        public static final int server_url_cristi=0x7f0b0052;
-        /**  Peter 
-         */
-        public static final int server_url_local=0x7f0b0050;
+        public static final int server_url=0x7f0b004c;
         /**  Yusuf 
          */
-        public static final int server_url_p=0x7f0b004f;
+        public static final int server_url_ciprian=0x7f0b004e;
+        /**  strom 
+         */
+        public static final int server_url_cristi=0x7f0b004f;
         /**  demo server 
          */
-        public static final int server_url_spark_demo=0x7f0b004d;
-        /**  Spark 
+        public static final int server_url_yusuf=0x7f0b004d;
+        /**  cristi 
          */
-        public static final int server_url_yusuf=0x7f0b004e;
-        /**  cristie 
-         */
-        public static final int submit=0x7f0b0053;
-        public static final int tenent_id=0x7f0b0054;
-        public static final int user_name=0x7f0b0055;
-        public static final int user_reg=0x7f0b0056;
-        public static final int valid_till=0x7f0b0057;
-        public static final int vod=0x7f0b0058;
-        public static final int watch=0x7f0b0059;
+        public static final int submit=0x7f0b0050;
+        public static final int tenent_id=0x7f0b0051;
+        public static final int user_name=0x7f0b0052;
+        public static final int user_reg=0x7f0b0053;
+        public static final int valid_till=0x7f0b0054;
+        public static final int vod=0x7f0b0055;
+        public static final int watch=0x7f0b0056;
     }
     public static final class style {
         /** 

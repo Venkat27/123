@@ -1,9 +1,11 @@
 package com.obs.androidiptv;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,25 +25,29 @@ import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,10 +57,16 @@ import com.obs.androidiptv.MyApplication.SortBy;
 import com.obs.data.DeviceDatum;
 import com.obs.data.EPGData;
 import com.obs.data.EpgDatum;
+import com.obs.data.ResponseObj;
 import com.obs.data.ServiceDatum;
 import com.obs.database.DBHelper;
 import com.obs.database.ServiceProvider;
 import com.obs.retrofit.OBSClient;
+import com.obs.utils.Utilities;
+import com.paypal.android.sdk.payments.PayPalPayment;
+import com.paypal.android.sdk.payments.PayPalService;
+import com.paypal.android.sdk.payments.PaymentActivity;
+import com.paypal.android.sdk.payments.PaymentConfirmation;
 
 public class ChannelsActivity extends Activity implements
 		SurfaceHolder.Callback, MediaPlayer.OnPreparedListener,
@@ -88,7 +100,7 @@ public class ChannelsActivity extends Activity implements
 	String mChannelUrl;
 	int mSelectionIdx = -1;
 	ServiceDatum mService = null;
-	
+	ListView lv = null;
 
 	public static int mSortBy = SortBy.CATEGORY.ordinal();
 
@@ -132,8 +144,8 @@ public class ChannelsActivity extends Activity implements
 			SurfaceHolder videoHolder = videoSurface.getHolder();
 			videoHolder.addCallback(this);
 			player.setDisplay(videoHolder);
-			//initiallizeUI();
-			 CheckBalancenGetData();
+			// initiallizeUI();
+			CheckBalancenGetData();
 		}
 	}
 
@@ -160,7 +172,7 @@ public class ChannelsActivity extends Activity implements
 		case R.id.action_refresh:
 			mIsRefresh = true;
 			CheckBalancenGetData();
-//			initiallizeUI();
+			// initiallizeUI();
 			break;
 		case R.id.action_search:
 			onSearchRequested();
@@ -170,26 +182,26 @@ public class ChannelsActivity extends Activity implements
 			// mReqType = ServiceProvider.SERVICES;
 			mSelection = DBHelper.IS_FAVOURITE + "=1";
 			CheckBalancenGetData();
-			//initiallizeUI();
+			// initiallizeUI();
 			break;
 		case R.id.action_channels:
 			CheckBalancenGetData();
-			//initiallizeUI();
+			// initiallizeUI();
 			break;
 		case R.id.action_sort_by_default:
 			mSortBy = SortBy.DEFAULT.ordinal();
 			CheckBalancenGetData();
-			//initiallizeUI();
+			// initiallizeUI();
 			break;
 		case R.id.action_sort_by_categ:
 			mSortBy = SortBy.CATEGORY.ordinal();
 			CheckBalancenGetData();
-			//initiallizeUI();
+			// initiallizeUI();
 			break;
 		case R.id.action_sort_by_lang:
 			mSortBy = SortBy.LANGUAGE.ordinal();
 			CheckBalancenGetData();
-			//initiallizeUI();
+			// initiallizeUI();
 			break;
 		default:
 			break;
@@ -204,13 +216,13 @@ public class ChannelsActivity extends Activity implements
 
 		if (mSelectionIdx == -1) {
 			CheckBalancenGetData();
-			//initiallizeUI();
+			// initiallizeUI();
 		} else {
 			if (mService != null)
 				OnChannelSelection(mService.getUrl(), mService.getChannelName());
 		}
 	}
-	
+
 	private void CheckBalancenGetData() {
 		// Log.d("ChannelsActivity","CheckBalancenGetData");
 		if (mIsBalCheckReq)
@@ -218,6 +230,7 @@ public class ChannelsActivity extends Activity implements
 		else
 			initiallizeUI();
 	}
+
 	private void validateDevice() {
 
 		if (isRemoteDeviceValidationReq()) {
@@ -262,9 +275,33 @@ public class ChannelsActivity extends Activity implements
 					mProgressDialog = null;
 				}
 				if (device != null) {
-					mApplication.setBalance(mBalance = device
-							.getBalanceAmount());
+					mApplication
+							.setClientId(Long.toString(device.getClientId()));
+					mApplication.setBalance(device.getBalanceAmount());
 					mApplication.setBalanceCheck(device.isBalanceCheck());
+					boolean isPayPalReq = device.getPaypalConfigData()
+							.getEnabled();
+					mApplication.setPayPalReq(isPayPalReq);
+					if (isPayPalReq) {
+						String value = device.getPaypalConfigData().getValue();
+						try {
+							JSONObject json = new JSONObject(value);
+							if (json != null) {
+								mApplication.setPayPalClientID(json.get(
+										"clientId").toString());
+								mApplication.setPayPalSecret(json.get(
+										"secretCode").toString());
+							}
+						} catch (JSONException e) {
+							Log.e("ChannelsActivity",
+									(e.getMessage() == null) ? "Json Exception"
+											: e.getMessage());
+							Toast.makeText(ChannelsActivity.this,
+									"Invalid Data-Json Exception",
+									Toast.LENGTH_LONG).show();
+						}
+
+					}
 					initiallizeUI();
 				}
 			}
@@ -280,18 +317,16 @@ public class ChannelsActivity extends Activity implements
 					mProgressDialog = null;
 				}
 				if (retrofitError.isNetworkError()) {
-					Toast.makeText(
-							ChannelsActivity.this,
-							getString(
-									R.string.error_network), Toast.LENGTH_LONG)
-							.show();
+					Toast.makeText(ChannelsActivity.this,
+							getString(R.string.error_network),
+							Toast.LENGTH_LONG).show();
 				} else if (retrofitError.getResponse().getStatus() == 403) {
 					String msg = mApplication
 							.getDeveloperMessage(retrofitError);
 					msg = (msg != null && msg.length() > 0 ? msg
 							: "Internal Server Error");
-					Toast.makeText(ChannelsActivity.this, msg, Toast.LENGTH_LONG)
-							.show();
+					Toast.makeText(ChannelsActivity.this, msg,
+							Toast.LENGTH_LONG).show();
 				} else {
 					Toast.makeText(
 							ChannelsActivity.this,
@@ -305,9 +340,9 @@ public class ChannelsActivity extends Activity implements
 	};
 
 	private void initiallizeUI() {
-	    //get balance
-	     mBalance = mApplication.getBalance();
-	     
+		// get balance
+		mBalance = mApplication.getBalance();
+
 		// Log.d("ChannelsActivity","initiallizeUI");
 		Bundle b = new Bundle();
 		b.putString("SEARCHSTRING", mSearchString);
@@ -336,7 +371,7 @@ public class ChannelsActivity extends Activity implements
 		}
 		transaction.commit();
 	}
-	
+
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
@@ -545,52 +580,78 @@ public class ChannelsActivity extends Activity implements
 	}
 
 	private void OnChannelSelection(String url, String channelName) {
-		
-		if(mIsBalCheckReq== true && (mBalance>=0)){
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					(this), AlertDialog.THEME_HOLO_LIGHT);
+
+		if (mIsBalCheckReq == true && (mBalance >= 0)) {
+			AlertDialog.Builder builder = new AlertDialog.Builder((this),
+					AlertDialog.THEME_HOLO_LIGHT);
 			builder.setIcon(R.drawable.ic_logo_confirm_dialog);
-			builder.setTitle("Confirmation");			
-			String msg = "Insufficient Balance."+(mIsPayPalReq==true?"Go to PayPal ??":"Please do Payment.");
+			builder.setTitle("Confirmation");
+			String msg = "Insufficient Balance."
+					+ (mIsPayPalReq == true ? "Go to PayPal ??"
+							: "Please do Payment.");
 			builder.setMessage(msg);
 			builder.setCancelable(false);
 			AlertDialog mConfirmDialog = builder.create();
-			mConfirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, (mIsPayPalReq==true?"No":""),
+			mConfirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+					(mIsPayPalReq == true ? "No" : ""),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int buttonId) {
 						}
 					});
-			mConfirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, (mIsPayPalReq==true?"Yes":"Ok"),
+			mConfirmDialog.setButton(AlertDialog.BUTTON_POSITIVE,
+					(mIsPayPalReq == true ? "Yes" : "Ok"),
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							if(mIsPayPalReq==true){
-								//call Paypal activity.
-							}
+
+							Intent svcIntent = new Intent(
+									ChannelsActivity.this, PayPalService.class);
+
+							svcIntent.putExtra(
+									PayPalService.EXTRA_PAYPAL_CONFIGURATION,
+									mApplication.config);
+
+							startService(svcIntent);
+
+							PayPalPayment paymentData = new PayPalPayment(
+									new BigDecimal(mBalance), mApplication
+											.getCurrency(),
+									"AndroidIPTV-Payment",
+									PayPalPayment.PAYMENT_INTENT_SALE);
+
+							Intent actviIntent = new Intent(
+									ChannelsActivity.this,
+									PaymentActivity.class);
+
+							actviIntent.putExtra(PaymentActivity.EXTRA_PAYMENT,
+									paymentData);
+
+							startActivityForResult(actviIntent,
+									mApplication.REQUEST_CODE_PAYMENT);
 						}
 					});
 			mConfirmDialog.show();
-		}
-		else{
-		// Log.d("ChannelsActivity","OnChannelSelection");
-		mChannelName = channelName;
-		mChannelUrl = url;
-		if (player.isPlaying())
-			player.stop();
-		player.reset();
+		} else {
+			// Log.d("ChannelsActivity","OnChannelSelection");
+			mChannelName = channelName;
+			mChannelUrl = url;
+			if (player.isPlaying())
+				player.stop();
+			player.reset();
 
-		player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-		player.setVolume(1.0f, 1.0f);
-		try {
-			player.setDataSource(this, Uri.parse(url));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		player.setOnPreparedListener(this);
-		player.setOnErrorListener(this);
-		player.prepareAsync();
+			player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+			player.setVolume(1.0f, 1.0f);
+			try {
+				player.setDataSource(this, Uri.parse(url));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			player.setOnPreparedListener(this);
+			player.setOnErrorListener(this);
+			player.prepareAsync();
 
-		CheckCacheForEpgDetails(channelName);}
+			CheckCacheForEpgDetails(channelName);
+		}
 	}
 
 	@Override
@@ -615,7 +676,7 @@ public class ChannelsActivity extends Activity implements
 					Toast.LENGTH_SHORT).show();
 		} else {
 			if (null != mChannelUrl && null != mp)
-				OnChannelSelection(mChannelUrl,mChannelName);
+				OnChannelSelection(mChannelUrl, mChannelName);
 		}
 
 		return true;
@@ -677,41 +738,44 @@ public class ChannelsActivity extends Activity implements
 	@Override
 	public void onItemClick(ServiceDatum data, int selIdx, int sortBy,
 			String selection, String searchString) {
-		if(mIsBalCheckReq== true && (mBalance>=0)){
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					(this), AlertDialog.THEME_HOLO_LIGHT);
+		if (mIsBalCheckReq == true && (mBalance >= 0)) {
+			AlertDialog.Builder builder = new AlertDialog.Builder((this),
+					AlertDialog.THEME_HOLO_LIGHT);
 			builder.setIcon(R.drawable.ic_logo_confirm_dialog);
-			builder.setTitle("Confirmation");			
-			String msg = "Insufficient Balance."+(mIsPayPalReq==true?"Go to PayPal ??":"Please do Payment.");
+			builder.setTitle("Confirmation");
+			String msg = "Insufficient Balance."
+					+ (mIsPayPalReq == true ? "Go to PayPal ??"
+							: "Please do Payment.");
 			builder.setMessage(msg);
 			builder.setCancelable(false);
 			AlertDialog mConfirmDialog = builder.create();
-			mConfirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE, (mIsPayPalReq==true?"No":""),
+			mConfirmDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+					(mIsPayPalReq == true ? "No" : ""),
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int buttonId) {
 						}
 					});
-			mConfirmDialog.setButton(AlertDialog.BUTTON_POSITIVE, (mIsPayPalReq==true?"Yes":"OK"),
+			mConfirmDialog.setButton(AlertDialog.BUTTON_POSITIVE,
+					(mIsPayPalReq == true ? "Yes" : "OK"),
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							if(mIsPayPalReq==true){
-								//call Paypal activity.
+							if (mIsPayPalReq == true) {
+								// call Paypal activity.
 							}
 						}
 					});
 			mConfirmDialog.show();
-		}
-		else{
-		mSelectionIdx = selIdx;
-		mService = data;
-		if (player != null) {
-			if (player.isPlaying())
-				player.stop();
-			player.release();
-			player = null;
-		}
-		playChannel(data, sortBy, selection, searchString);
+		} else {
+			mSelectionIdx = selIdx;
+			mService = data;
+			if (player != null) {
+				if (player.isPlaying())
+					player.stop();
+				player.release();
+				player = null;
+			}
+			playChannel(data, sortBy, selection, searchString);
 		}
 	}
 
@@ -783,5 +847,144 @@ public class ChannelsActivity extends Activity implements
 		} else
 			return true;
 		return false;
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		/** Stop PayPalIntent Service... */
+		stopService(new Intent(this, PayPalService.class));
+		if (resultCode == Activity.RESULT_OK) {
+			PaymentConfirmation confirm = data
+					.getParcelableExtra(PaymentActivity.EXTRA_RESULT_CONFIRMATION);
+			if (confirm != null) {
+				try {
+					Log.i("OBSPayment", confirm.toJSONObject().toString(4));
+					/** Call OBS API for verification and payment record. */
+					OBSPaymentAsyncTask task = new OBSPaymentAsyncTask();
+					task.execute(confirm.toJSONObject().toString(4));
+				} catch (JSONException e) {
+					Log.e("OBSPayment",
+							"an extremely unlikely failure occurred: ", e);
+				}
+			}
+		} else if (resultCode == Activity.RESULT_CANCELED) {
+			Log.i("OBSPayment", "The user canceled.");
+		} else if (resultCode == PaymentActivity.RESULT_EXTRAS_INVALID) {
+			Log.i("OBSPayment",
+					"An invalid Payment or PayPalConfiguration was submitted. Please see the docs.");
+		}
+	}
+
+	private class OBSPaymentAsyncTask extends
+			AsyncTask<String, Void, ResponseObj> {
+		JSONObject reqJson = null;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			if (mProgressDialog != null) {
+				mProgressDialog.dismiss();
+				mProgressDialog = null;
+			}
+			mProgressDialog = new ProgressDialog(ChannelsActivity.this,
+					ProgressDialog.THEME_HOLO_DARK);
+			mProgressDialog.setMessage("Registering Details");
+			mProgressDialog.setCanceledOnTouchOutside(false);
+			mProgressDialog.setOnCancelListener(new OnCancelListener() {
+
+				public void onCancel(DialogInterface arg0) {
+					if (mProgressDialog.isShowing())
+						mProgressDialog.dismiss();
+
+					Toast.makeText(ChannelsActivity.this,
+							"Payment verification Failed.", Toast.LENGTH_LONG)
+							.show();
+					cancel(true);
+				}
+			});
+			mProgressDialog.show();
+		}
+
+		@Override
+		protected ResponseObj doInBackground(String... arg) {
+			ResponseObj resObj = new ResponseObj();
+			try {
+				reqJson = new JSONObject(arg[0]);
+
+				if (mApplication.isNetworkAvailable()) {
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("TagURL", "/payments/paypalEnquirey/"
+							+ mApplication.getClientId());
+					map.put("response", reqJson.getString("response"));
+					map.put("client", reqJson.getString("client"));
+					map.put("response_type", reqJson.getString("response_type"));
+					resObj = Utilities.callExternalApiPostMethod(
+							getApplicationContext(), map);
+				} else {
+					resObj.setFailResponse(100, "Network error.");
+				}
+			} catch (JSONException e) {
+				Log.e("ChannelsActivity-ObsPaymentCheck",
+						(e.getMessage() == null) ? "Json Exception" : e
+								.getMessage());
+				Toast.makeText(ChannelsActivity.this,
+						"Invalid Data-Json Exception", Toast.LENGTH_LONG)
+						.show();
+				e.printStackTrace();
+			}
+			return resObj;
+		}
+
+		@Override
+		protected void onPostExecute(ResponseObj resObj) {
+
+			super.onPostExecute(resObj);
+			if (mProgressDialog.isShowing()) {
+				mProgressDialog.dismiss();
+			}
+
+			if (resObj.getStatusCode() == 200) {
+				Toast.makeText(ChannelsActivity.this,
+						"Payment Verification Success", Toast.LENGTH_LONG)
+						.show();
+				// update client Balance
+			} else {
+				Toast.makeText(ChannelsActivity.this,
+						"Server Error : " + resObj.getsErrorMessage(),
+						Toast.LENGTH_LONG).show();
+			}
+		}
+	}
+
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		ListView lv = null;
+		if (mSortBy == SortBy.DEFAULT.ordinal()) {
+			lv = (ListView) findViewById(R.id.f_channels_lv);
+		} else
+			lv = (ExpandableListView) findViewById(R.id.elv);
+		if (null != lv) {
+			int position = lv.getSelectedItemPosition();
+			if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
+				if (position < lv.getCount() - 1) {
+					position++;
+					lv.requestFocus();
+					lv.setSelection(position);
+					if (position - 2 > 0)
+						lv.smoothScrollToPosition(position - 2);
+					return true;
+				}
+			} else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
+				if (position > 0) {
+					lv.requestFocus();
+					position--;
+					lv.setSelection(position);
+					if (position + 2 <= lv.getCount())
+						lv.smoothScrollToPosition(position + 2);
+					return true;
+				}
+			}
+		}
+		return super.onKeyDown(keyCode, event);
 	}
 }

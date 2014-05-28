@@ -26,7 +26,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RatingBar;
@@ -377,16 +376,8 @@ public class VodMovieDetailsActivity extends Activity {
 			mIsReqCanceled = true;
 			this.finish();
 		} else if (keyCode == 23) {
-			/*View focusedView = getWindow().getCurrentFocus();
-			focusedView.performClick();*/
-			Window window = getWindow();
-			if(window!=null)
-			{
-				View focusedView = window.getCurrentFocus();
-				if(focusedView!=null){
-					focusedView.performClick();
-				}
-			}
+			View focusedView = getWindow().getCurrentFocus();
+			focusedView.performClick();
 		}
 		return super.onKeyDown(keyCode, event);
 	}

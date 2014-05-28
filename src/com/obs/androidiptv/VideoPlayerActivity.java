@@ -404,11 +404,11 @@ public class VideoPlayerActivity extends Activity implements
 
 				if (mserviceList != null && mChannelId != -1) {
 					mChannelIndex = getChannelIndexByChannelId(mChannelId);
-					if (keyCode == 19) {
+					if (keyCode == 20) {
 						mChannelIndex++;
 						if (mChannelIndex == mserviceList.size())
 							mChannelIndex = 0;
-					} else if (keyCode == 20) {
+					} else if (keyCode == 19) {
 						mChannelIndex--;
 						if (mChannelIndex < 0)
 							mChannelIndex = mserviceList.size() - 1;
@@ -420,14 +420,12 @@ public class VideoPlayerActivity extends Activity implements
 				return true;
 			}
 		} else if (keyCode ==23) {  //23
-			//View focusedView = getWindow().getCurrentFocus();
-			//focusedView.performClick();
+			
 			if(controller.isShowing()){
 				controller.hide();
 			}else{
 				controller.show();
 			}
-			
 		} else
 			super.onKeyDown(keyCode, event);
 		return true;
@@ -477,7 +475,6 @@ public class VideoPlayerActivity extends Activity implements
 	}
 
 	private void loadServicesfromCursor(Cursor cursor) {
-		if(cursor.getCount()>0){
 		mserviceList.clear();
 		try {
 			if (mSortBy == SortBy.DEFAULT.ordinal()) {
@@ -589,7 +586,6 @@ public class VideoPlayerActivity extends Activity implements
 					Cursor childCursor = null;
 
 					childCursor = cursorLoader.loadInBackground();
-					if(childCursor.getCount()>0){
 					childCursor.moveToFirst();
 					do {
 						int serviceIdx = childCursor
@@ -617,7 +613,7 @@ public class VideoPlayerActivity extends Activity implements
 						service.setUrl(childCursor.getString(urlIdx));
 						mserviceList.add(service);
 					} while (childCursor.moveToNext());
-					}
+
 				} while (cursor.moveToNext());
 			}
 			if (mChannelId != -1) {
@@ -626,7 +622,6 @@ public class VideoPlayerActivity extends Activity implements
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "Videoplayer-Cursor Exception");
-		}
 		}
 	}
 

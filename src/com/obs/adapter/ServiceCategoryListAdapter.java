@@ -1,7 +1,5 @@
 package com.obs.adapter;
 
-import java.util.HashMap;
-
 import android.content.Context;
 import android.content.CursorLoader;
 import android.database.Cursor;
@@ -22,7 +20,7 @@ import com.obs.database.ServiceProvider;
 
 public class ServiceCategoryListAdapter extends CursorTreeAdapter {
 
-	public HashMap<String, View> childView = new HashMap<String, View>();
+	//public HashMap<String, View> childView = new HashMap<String, View>();
 
 	private static final String TAG = ServiceCategoryListAdapter.class
 			.getName();
@@ -47,7 +45,6 @@ public class ServiceCategoryListAdapter extends CursorTreeAdapter {
 	@Override
 	public View newGroupView(Context context, Cursor cursor,
 			boolean isExpanded, ViewGroup parent) {
-
 		final View view = mInflater.inflate(R.layout.f_list_category_row_item,
 				parent, false);
 		return view;

@@ -10,7 +10,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -88,16 +87,8 @@ public class MainActivity extends Activity {
 					});
 			mConfirmDialog.show();
 		} else if (keyCode == 23) {
-			/*View focusedView = getWindow().getCurrentFocus();
-			focusedView.performClick();*/
-			Window window = getWindow();
-			if(window!=null)
-			{
-				View focusedView = window.getCurrentFocus();
-				if(focusedView!=null){
-					focusedView.performClick();
-				}
-			}
+			View focusedView = getWindow().getCurrentFocus();
+			focusedView.performClick();
 		}
 		return super.onKeyDown(keyCode, event);
 	}

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -73,16 +72,8 @@ public class MyAccountActivity extends Activity {
 		if (keyCode == 4) {
 			this.finish();
 		} else if (keyCode == 23) {
-			/*View focusedView = getWindow().getCurrentFocus();
-			focusedView.performClick();*/
-			Window window = getWindow();
-			if(window!=null)
-			{
-				View focusedView = window.getCurrentFocus();
-				if(focusedView!=null){
-					focusedView.performClick();
-				}
-			}
+			View focusedView = getWindow().getCurrentFocus();
+			focusedView.performClick();
 		} else {
 			Fragment frag = getFragmentManager().findFragmentByTag(FRAG_TAG);
 			if (frag != null) {

@@ -17,8 +17,10 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -161,7 +163,7 @@ public class ChannelsByDefOrderFrag extends Fragment implements
 		lv.setOnItemSelectedListener(this);
 		lv.setOnItemLongClickListener(this);
 		lv.setOnItemClickListener(this);
-
+		
 		CheckBalancenGetData();
 		}
 
@@ -277,7 +279,7 @@ public class ChannelsByDefOrderFrag extends Fragment implements
 			getServices();
 	}
 
-	private void validateDevice() {
+/*	private void validateDevice() {
 
 		if (((ChannelsActivity) getActivity()).isRemoteDeviceValidationReq()) {
 			// Log.d("ChannelsActivity","validateDevice");
@@ -309,8 +311,8 @@ public class ChannelsByDefOrderFrag extends Fragment implements
 			doValidation();
 		}
 	}
-
-	final Callback<DeviceDatum> deviceCallBack = new Callback<DeviceDatum>() {
+*/
+/*	final Callback<DeviceDatum> deviceCallBack = new Callback<DeviceDatum>() {
 
 		@Override
 		public void success(DeviceDatum device, Response arg1) {
@@ -362,7 +364,7 @@ public class ChannelsByDefOrderFrag extends Fragment implements
 			mIsReqCanceled = false;
 		}
 	};
-
+*/
 	private void doValidation() {
 		/*mBalance = mApplication.getBalance();
 		if (mBalance >= 0)

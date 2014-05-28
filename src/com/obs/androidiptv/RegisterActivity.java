@@ -21,7 +21,6 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -195,16 +194,8 @@ public class RegisterActivity extends Activity {
 		if ((keyCode == KeyEvent.KEYCODE_BACK) || keyCode == 4) {
 			closeApp();
 		} else if (keyCode == 23) {
-			/*View focusedView = getWindow().getCurrentFocus();
-			focusedView.performClick();*/
-			Window window = getWindow();
-			if(window!=null)
-			{
-				View focusedView = window.getCurrentFocus();
-				if(focusedView!=null){
-					focusedView.performClick();
-				}
-			}
+			View focusedView = getWindow().getCurrentFocus();
+			focusedView.performClick();
 		}
 		return super.onKeyDown(keyCode, event);
 	}

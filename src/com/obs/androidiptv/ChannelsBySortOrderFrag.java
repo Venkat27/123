@@ -304,7 +304,7 @@ public class ChannelsBySortOrderFrag extends Fragment implements
 		else*/
 			getServices();
 	}
-
+/*
 	private void validateDevice() {
 		if (((ChannelsActivity) getActivity()).isRemoteDeviceValidationReq()) {
 			// Log.d("ChannelsActivity","validateDevice");
@@ -336,8 +336,8 @@ public class ChannelsBySortOrderFrag extends Fragment implements
 			doValidation();
 		}
 	}
-
-	final Callback<DeviceDatum> deviceCallBack = new Callback<DeviceDatum>() {
+*/
+/*	final Callback<DeviceDatum> deviceCallBack = new Callback<DeviceDatum>() {
 
 		@Override
 		public void success(DeviceDatum device, Response arg1) {
@@ -348,9 +348,9 @@ public class ChannelsBySortOrderFrag extends Fragment implements
 					mProgressDialog = null;
 				}
 				if (device != null) {
-					/*mApplication.setBalance(mBalance = device
+					mApplication.setBalance(mBalance = device
 							.getBalanceAmount());
-					mApplication.setBalanceCheck(device.isBalanceCheck());*/
+					mApplication.setBalanceCheck(device.isBalanceCheck());
 					doValidation();
 				}
 			}
@@ -389,7 +389,7 @@ public class ChannelsBySortOrderFrag extends Fragment implements
 			mIsReqCanceled = false;
 		}
 	};
-
+*/
 	private void doValidation() {
 		/*mBalance = mApplication.getBalance();
 		if (mBalance >= 0)

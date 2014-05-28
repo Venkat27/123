@@ -14,6 +14,6 @@
         android:text="channel name"
         android:textAppearance="@android:style/TextAppearance"
         android:textColor="@drawable/selector_a_ch_lv_item_ch_name_text"
-        android:textSize="20sp" />
+        android:textSize="13sp" />
 
 </LinearLayout>

@@ -32,13 +32,13 @@ public class PayPalActivity extends Activity {
     .merchantName("Android IPTV")
     .merchantPrivacyPolicyUri(Uri.parse("https://www.example.com/privacy"))
     .merchantUserAgreementUri(Uri.parse("https://www.example.com/legal"));
-	/*  Paypal configurations*/  
+	/**  Paypal configurations*/  
 	
 	
 	   @Override
 	    protected void onCreate(Bundle savedInstanceState) {
 	        super.onCreate(savedInstanceState);
-	        setContentView(R.layout.activity_paypal);
+	       // setContentView(R.layout.activity_paypal);
 
 	        Intent intent = new Intent(this, PayPalService.class);
 	        intent.putExtra(PayPalService.EXTRA_PAYPAL_CONFIGURATION, config);

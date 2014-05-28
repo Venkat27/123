@@ -2,6 +2,9 @@ package com.obs.androidiptv;
 
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -16,7 +19,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -119,8 +121,25 @@ public class AuthenticationAcitivity extends Activity {
 							.setClientId(Long.toString(device.getClientId()));
 					mApplication.setBalance(device.getBalanceAmount());
 					mApplication.setBalanceCheck(device.isBalanceCheck());
+					boolean isPayPalReq =device.getPaypalConfigData().getEnabled();
+					mApplication.setPayPalReq(isPayPalReq);
+					if(isPayPalReq){
+						String value = device.getPaypalConfigData().getValue();
+						try {
+							JSONObject json = new JSONObject(value);
+							if(json!=null){
+								mApplication.setPayPalClientID(json.get("clientId").toString());
+								mApplication.setPayPalSecret(json.get("secretCode").toString());
+							}
+						} catch (JSONException e) {
+							Log.e("AuthenticationAcitivity", (e.getMessage()==null)?"Json Exception":e.getMessage());
+							Toast.makeText(AuthenticationAcitivity.this, "Invalid Data-Json Exception", Toast.LENGTH_LONG).show();
+						}
+						
+					}
 					mOBSClient.getActivePlans(mApplication.getClientId(),
 							activePlansCallBack);
+					
 				} else {
 					Toast.makeText(AuthenticationAcitivity.this,
 							"Server Error  :Device details not exists",
@@ -192,16 +211,8 @@ public class AuthenticationAcitivity extends Activity {
 				mConfirmDialog.show();
 			}
 		} else if (keyCode == 23) {
-			/*View focusedView = getWindow().getCurrentFocus();
-			focusedView.performClick();*/
-			Window window = getWindow();
-			if(window!=null)
-			{
-				View focusedView = window.getCurrentFocus();
-				if(focusedView!=null){
-					focusedView.performClick();
-				}
-			}
+			View focusedView = getWindow().getCurrentFocus();
+			focusedView.performClick();
 		}
 		return super.onKeyDown(keyCode, event);
 	}

@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.ExpandableListView;
 import android.widget.ExpandableListView.OnGroupClickListener;
 import android.widget.RadioButton;
@@ -185,16 +184,8 @@ public class PlanActivity extends Activity {
 		if ((keyCode == KeyEvent.KEYCODE_BACK) || keyCode == 4) {
 			closeApp();
 		} else if (keyCode == 23) {
-			/*View focusedView = getWindow().getCurrentFocus();
-			focusedView.performClick();*/
-			Window window = getWindow();
-			if(window!=null)
-			{
-				View focusedView = window.getCurrentFocus();
-				if(focusedView!=null){
-					focusedView.performClick();
-				}
-			}
+			View focusedView = getWindow().getCurrentFocus();
+			focusedView.performClick();
 		}
 		return super.onKeyDown(keyCode, event);
 	}
@@ -252,7 +243,7 @@ public class PlanActivity extends Activity {
 				map.put("contractPeriod", plan.getContractId().toString());
 				map.put("isNewplan", "true");
 				map.put("start_date", formattedDate);
-				map.put("billAlign", "true");
+				map.put("billAlign", "false");
 				map.put("paytermCode", plan.getServices().get(0)
 						.getChargeCode());
 

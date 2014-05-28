@@ -8,6 +8,7 @@ public class DeviceDatum {
 	private long clientTypeId;
 	private float balanceAmount;
 	private boolean balanceCheck;
+	private PaypalConfigData paypalConfigData;
 
 	public long getDeviceId() {
 		return deviceId;
@@ -40,6 +41,7 @@ public class DeviceDatum {
 	public void setClientTypeId(long clientTypeId) {
 		this.clientTypeId = clientTypeId;
 	}
+
 	public float getBalanceAmount() {
 		return balanceAmount;
 	}
@@ -55,4 +57,13 @@ public class DeviceDatum {
 	public void setBalanceCheck(boolean balanceCheck) {
 		this.balanceCheck = balanceCheck;
 	}
+
+	public PaypalConfigData getPaypalConfigData() {
+		return paypalConfigData;
+	}
+
+	public void setPaypalConfigData(PaypalConfigData paypalConfigData) {
+		this.paypalConfigData = paypalConfigData;
+	}
+
 }
